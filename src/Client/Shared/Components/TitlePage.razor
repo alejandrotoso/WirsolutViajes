@@ -1,0 +1,20 @@
+﻿@namespace WirsolutViajes.Client.Shared.Components
+
+<div class="d-flex align-items-center justify-content-start mb-3 ml-3">
+    <MudText Typo="Typo.h5" Color="Color.Primary">
+        <div>@Title</div>
+    </MudText>
+
+    <MudText Color="Color.Surface" Class="ml-8 align-self-center">@Description</MudText>
+</div>
+
+
+@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Description { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

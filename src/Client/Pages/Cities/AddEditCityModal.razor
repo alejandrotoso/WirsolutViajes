@@ -1,0 +1,133 @@
+﻿@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudForm Model="@AddEditCityModel" @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+        <MudDialog>
+            <TitleContent>
+                @{
+                    if (AddEditCityModel.Id == 0)
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                            Agregar Ciudad
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                            Actualizar Ciudad
+                        </MudText>
+                    }
+                }
+            </TitleContent>
+            <DialogContent>
+                <MudGrid>
+                    @if (AddEditCityModel.Id != 0)
+                    {
+                        <MudItem xs="12" md="2">
+                            <MudTextField Disabled For="@(() => AddEditCityModel.Id)" @bind-Value="AddEditCityModel.Id" Label="Id" />
+                        </MudItem>
+                    }
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => _cityQuery)" @bind-Value="_cityQuery"
+                                      Label="Ciudad a Buscar"
+                                      Placeholder="Ingrese el nombre exacto de la ciudad"
+                                      Error="@GetFieldError(nameof(_cityQuery), out var errorText)" ErrorText="@errorText" />
+
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudButton DisableElevation Variant="Variant.Filled"
+                                   OnClick="GetCitiesAsync" StartIcon="@Icons.Material.Filled.Search"
+                                   IconColor="Color.Surface" Color="Color.Secondary">Buscar</MudButton>
+                    </MudItem>
+
+
+                    <MudItem xs="12"  md="12">
+                        <MudSelect T="string" Label="Ciudades" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Disabled="@(_locationResponseList == null || _locationResponseList.Count == 0)"
+                                   Placeholder="Seleccionar una city"
+                                   For="@(() => _locationResponse.Id)" @bind-Value="@_locationResponse.Id"
+                                   SelectedValuesChanged="@OnLocationSelected">
+                            
+                            @if (_locationResponseList != null)
+                            {
+                                foreach (var item in _locationResponseList)
+                                {
+                                    <MudSelectItem Value="@item.Id">@item.Description</MudSelectItem>
+                                }
+                            }
+
+                        </MudSelect>
+                    </MudItem>
+
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.Name)" @bind-Value="AddEditCityModel.Name"
+                                      Label="Ciudad"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.Name), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.State)" @bind-Value="AddEditCityModel.State"
+                                      Label="Estado"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.State), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.CountryISOCode)" @bind-Value="AddEditCityModel.CountryISOCode"
+                                      Label="Codigo ISO"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.CountryISOCode), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.Country)" @bind-Value="AddEditCityModel.Country"
+                                      Label="Pais"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.Country), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.Latitude)" @bind-Value="AddEditCityModel.Latitude"
+                                      Label="Latitud"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.Latitude), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditCityModel.Longitude)" @bind-Value="AddEditCityModel.Longitude"
+                                      Label="Longitud"
+                                      ReadOnly="true"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditCityModel.Longitude), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+
+                </MudGrid>
+            </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="Cancel">Cancelar</MudButton>
+                @if (AddEditCityModel.Id != 0)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Actualizar</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Guardar</MudButton>
+                }
+            </DialogActions>
+        </MudDialog>
+    </MudForm>
+}

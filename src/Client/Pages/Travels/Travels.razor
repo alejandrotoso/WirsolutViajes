@@ -1,0 +1,146 @@
+﻿@page "/"
+@using WirsolutViajes.Client.Shared.Components
+@using WirsolutViajes.Shared.DTOs
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+
+    .mud-table-cell {
+        white-space: nowrap;
+        padding-block: 3px !important;
+    }
+
+</style>
+
+<TitlePage Title="Viajes" Description="Gestión de fletes." />
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <div>
+        <div>
+            <MudCard Elevation="25" Class="mb-3">
+                <MudCardContent>
+                    <MudGrid Spacing="2" Class="mud-table-cell-padding-block-3  align-content-center">
+                        <MudItem xs="12" sm="2" md="2" Class="mud-table-cell-padding-block-3  align-content-center">
+                            <MudDatePicker Label="Fecha" Editable="true" AdornmentColor="Color.Primary"
+                                           Margin=" Margin.Dense" Variant="Variant.Outlined"
+                                           Date="_tripDate"
+                                           DateFormat="dd/MM/yyyy" Placeholder="Fecha Viaje"
+                                           DateChanged="@HandleDateToChanged"
+                                           IsDateDisabledFunc="CheckIsDateToDisabled" />
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4" Class="align-content-center">
+                            <MudSelect T="string" Label="Destino"
+                                       Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       Placeholder="Seleccionar Destino"
+                                       For="@(() => _destinationId)" @bind-Value="@_destinationId"
+                                       SelectedValuesChanged="@OnDestinoSelected">
+
+                                <MudSelectItem T="string" Value="@(0.ToString())">Todos los destinos</MudSelectItem>
+                                @foreach (var item in _citiesList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Description</MudSelectItem>
+                                }
+                            </MudSelect>
+
+
+                        </MudItem>
+                        <MudItem xs="12" sm="4" md="4" Class="align-content-center">
+                            <MudSelect T="string" Label="Tipo Vehículo" 
+                                       Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       Placeholder="Seleccionar Tipo Vehiculo"
+                                       For="@(() => _vehicleTypeId)" @bind-Value="@_vehicleTypeId"
+                                       SelectedValuesChanged="@OnVehicleTypeSelected">
+
+                                <MudSelectItem T="string" Value="@(0.ToString())">Todos los vehículos</MudSelectItem>
+                                @foreach (var item in _vehicleTypesList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="2" md="2" Class="mt-1 justify-center mud-text-align-center">
+                            <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Secondary"
+                                       OnClick="GetTripAsync"
+                                       StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface">Recargar</MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </div>
+
+        <MudTable Hover="true" Elevation="25" Items="_travelsList" Dense="@_dense" Bordered="@_bordered" Striped="@_striped"
+                  Filter="new Func<TripDTO, bool>(Search)" @bind-brand="_trip">
+
+            <ToolBarContent>
+                <div class="justify-center mud-text-align-center">
+                    <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">Crear</MudButton>
+                   @*  <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetTripAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary">Recargar</MudButton> *@
+                </div>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Buscar Viajes" Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+
+            </ToolBarContent>
+
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<TripDTO, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TripDTO, object>(x => x.TripDate)">Fecha</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TripDTO, object>(x => x.Destination.Description)">Destino</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<TripDTO, object>(x => x.Vehicle.Description)">Vehículo</MudTableSortLabel></MudTh>
+@*                 <MudTh>Activo</MudTh> *@
+
+                <MudTh Style="text-align:right">Acciones</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Fecha de Creación">
+                    <MudHighlighter Text="@context.TripDate.ToString("dd/MM/yyyy")" HighlightedText="@_searchString" />
+                </MudTd>
+
+
+                <MudTd DataLabel="Ciudad">
+                    <MudHighlighter Text="@context.Destination.Description" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Pais">
+                    <MudHighlighter Text="@context.Vehicle.Description.ToString()" HighlightedText="@_searchString" />
+                </MudTd>
+
+@*                 <MudTd DataLabel="Activo">
+                    <MudCheckBox @bind-Checked="@context.Active" ReadOnly Color="Color.Secondary"></MudCheckBox>
+                </MudTd> *@
+
+
+                <MudTd DataLabel="" Style="text-align:right; " Class="mud-table-cell">
+                    <MudTooltip Text="Editar vehículo" Color="Color.Default">
+                        <MudFab @onclick="@(() => InvokeModal(@context.Id))" 
+                                Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                    </MudTooltip>
+                    <MudTooltip Text="Eliminar viaje." Color="Color.Default">
+                        <MudFab @onclick="@(() => Delete(@context))"
+                                Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                    </MudTooltip>
+@*                     <MudTooltip Text="Activar vehículo." Color="Color.Default">
+                        <MudFab @onclick="@(() => Activate(@context))" Disabled="@(context.Active)"
+                                Color="Color.Success" StartIcon="@Icons.Material.Filled.Check" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                    </MudTooltip> *@
+                </MudTd>
+
+
+            </RowTemplate>
+            <PagerContent>
+                <TablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Denso</MudSwitch>
+        <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Rayado</MudSwitch>
+        <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordeado</MudSwitch>
+    </div>
+}

@@ -1,0 +1,138 @@
+﻿@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudForm Model="@AddEditVehicleModel" @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+        <MudDialog>
+            <TitleContent>
+                @{
+                    if (AddEditVehicleModel.Id == 0)
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                            Agregar Vehículo
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                            Actualizar Vehículo
+                        </MudText>
+                    }
+                }
+            </TitleContent>
+            <DialogContent>
+                <MudGrid>
+                    @if (AddEditVehicleModel.Id != 0)
+                    {
+                        <MudItem xs="12" md="6">
+                            <MudTextField Disabled For="@(() => AddEditVehicleModel.Id)" @bind-Value="AddEditVehicleModel.Id" Label="Id" Margin="Margin.Dense" />
+                        </MudItem>
+                    }
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Tipo Vehículo" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Placeholder="Seleccionar Tipo Vehículo"
+                                   For="@(() => _vehicleTypeId)" @bind-Value="@_vehicleTypeId"
+                                   SelectedValuesChanged="@OnVehicleTypeSelected">
+
+                           
+                            @foreach (var item in _vehicleTypesList)
+                            {
+                                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Subtipos Vehículo" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   ReadOnly="@(_vehicleTypeId=="")"
+                                   Placeholder="Seleccionar subtipo Vehículo"
+                                   For="@(() => AddEditVehicleModel.VehicleSubtypeId)" @bind-Value="@AddEditVehicleModel.VehicleSubtypeId">
+
+                            @if (_vehicleSubtypesList != null)
+                            {
+                                foreach (var item in _vehicleSubtypesList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            }
+
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Marca" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   ReadOnly="@(_vehicleTypeId=="")"
+                                   Placeholder="Seleccionar Marca"
+                                   For="@(() => _brandId)" @bind-Value="@_brandId"
+                                   SelectedValuesChanged="@OnBrandSelected">
+
+                            @if (_brandsList != null)
+                            {
+                                foreach (var item in _brandsList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Modelo" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   ReadOnly="@(_brandId=="")"
+                                   Placeholder="Seleccionar Modelo"
+                                   For="@(() => AddEditVehicleModel.ModelId)" @bind-Value="@AddEditVehicleModel.ModelId">
+
+                            @if (_modelsList != null)
+                            {
+                                foreach (var item in _modelsList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField For="@(() => AddEditVehicleModel.LicensePlate)" @bind-Value="AddEditVehicleModel.LicensePlate"
+                                      Immediate="true" MaxLength="8"
+                                      Label="Patente" Margin="Margin.Dense"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditVehicleModel.LicensePlate), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="int" For="@(() => AddEditVehicleModel.YearManufactured)" @bind-Value="AddEditVehicleModel.YearManufactured"
+                                      Immediate="true" MaxLength="4"
+                                      Label="Año Fabricacion" Margin="Margin.Dense"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditVehicleModel.YearManufactured), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="int" For="@(() => AddEditVehicleModel.Mileage)" @bind-Value="AddEditVehicleModel.Mileage"
+                                      Immediate="true" MaxLength="7"
+                                      Label="Kilometraje" Margin="Margin.Dense"
+                                      Required="true"
+                                      Error="@GetFieldError(nameof(AddEditVehicleModel.Mileage), out var errorText)" ErrorText="@errorText" />
+                    </MudItem>
+                </MudGrid>
+            </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="Cancel">Cancelar</MudButton>
+                @if (AddEditVehicleModel.Id != 0)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Actualizar</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Guardar</MudButton>
+                }
+            </DialogActions>
+        </MudDialog>
+    </MudForm>
+}

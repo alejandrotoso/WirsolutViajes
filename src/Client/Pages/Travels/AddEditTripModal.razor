@@ -1,0 +1,131 @@
+﻿@using WirsolutViajes.Client.Shared.Components
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudForm Model="@AddEditTripModel" @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+        <MudDialog>
+            <TitleContent>
+                @{
+                    if (AddEditTripModel.Id == 0)
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                            Agregar Viaje
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.h6">
+                            <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                            Actualizar Viaje
+                        </MudText>
+                    }
+                }
+            </TitleContent>
+            <DialogContent>
+                <MudGrid>
+                    @if (AddEditTripModel.Id != 0)
+                    {
+                        <MudItem xs="12" md="6">
+                            <MudTextField Disabled For="@(() => AddEditTripModel.Id)" @bind-Value="AddEditTripModel.Id" Label="Id" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                        </MudItem>
+                    }
+
+                    <MudItem xs="12" md="6">
+                        <MudDatePicker Label="Fecha" Editable="true" AdornmentColor="Color.Primary"
+                                       Margin=" Margin.Dense" Variant="Variant.Outlined"
+                                       Date="AddEditTripModel.TripDate"
+                                       DateFormat="dd/MM/yyyy" Placeholder="Fecha Viaje"
+                                       DateChanged="@HandleDateToChanged" 
+                                       IsDateDisabledFunc="CheckIsDateToDisabled" />
+                    </MudItem>
+
+
+                    <MudItem xs="12" md="6">
+                        <MudAutocomplete T="int" Label="Destino"
+                                         Required="true"
+                                         For="@(() => AddEditTripModel.DestinationId)" @bind-Value="AddEditTripModel.DestinationId"
+                                         ResetValueOnEmptyText="true" SearchFunc="@SearchCities"
+                                         Margin="Margin.Dense" Variant="Variant.Outlined" Dense="true" Strict="false"
+                                         Placeholder="Seleccionar destino"
+                                         ToStringFunc="@(i => _citiesList.FirstOrDefault(b => b.Id == i)?.Description ?? string.Empty)"
+                                         TextChanged="@HandleChangeDestino"
+                                         Error="@GetFieldError(nameof(AddEditTripModel.DestinationId), out var errorText)" ErrorText="@errorText" />
+
+                    </MudItem>
+
+                    <MudItem xs="12" md="12">
+                        @if (_dayForecast != null)
+                        {
+                            <DayForecast DailyForecast="_dayForecast" />
+                        }
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Tipo Vehículo" Required="true"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Placeholder="Seleccionar Tipo Vehículo"
+                                   For="@(() => _vehicleTypeId)" @bind-Value="@_vehicleTypeId"
+                                   SelectedValuesChanged="@OnVehicleTypeSelected">
+
+                            @foreach (var item in _vehicleTypesList)
+                            {
+                                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6" md="6">
+                        <MudSelect T="string" Label="Subtipos Vehículo" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   ReadOnly="@(_vehicleTypeId=="")"
+                             
+                                   For="@(() => _subtypeVehicleId)" @bind-Value="@_subtypeVehicleId"
+                                   SelectedValuesChanged="@OnSubtypeVehicleSelected">
+
+                            @if (_vehicleSubtypesList != null)
+                            {
+                                <MudSelectItem T="string" Value="@(0.ToString())">Todos</MudSelectItem>
+                                foreach (var item in _vehicleSubtypesList)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            }
+
+                        </MudSelect>
+                    </MudItem>
+
+
+                    <MudItem xs="12" md="12">
+                        <MudAutocomplete T="int" Label="Vehículo"
+                                         Required="true"
+                                         For="@(() => AddEditTripModel.VehicleId)" @bind-Value="AddEditTripModel.VehicleId"
+                                         ResetValueOnEmptyText=" true" SearchFunc="@SearchVehiculos"
+                                         Margin="Margin.Dense"
+                                         Variant="Variant.Outlined" Dense="true" Strict="false"
+                                         Placeholder="Seleccionar Vehículo"
+                                         ToStringFunc="@(i => _vehiclesList.FirstOrDefault(b => b.Id == i)?.Description ?? string.Empty)"
+                                         Error="@GetFieldError(nameof(AddEditTripModel.VehicleId), out var errorText)" ErrorText="@errorText" />
+
+                    </MudItem>
+
+                </MudGrid>
+            </DialogContent>
+            <DialogActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="Cancel">Cancelar</MudButton>
+                @if (AddEditTripModel.Id != 0)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Actualizar</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="ml-auto" ButtonType="ButtonType.Button" OnClick="ValidateForm">Guardar</MudButton>
+                }
+            </DialogActions>
+        </MudDialog>
+    </MudForm>
+}

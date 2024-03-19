@@ -1,0 +1,58 @@
+﻿@using System.Globalization
+@using WirsolutViajes.Client.Infrastructure.DTOs
+
+
+
+<MudGrid Class="white-text" Style="@($"background:{Colors.BlueGrey.Darken1};")">
+    <MudItem xs="12" sm="5">
+        <MudText>@_formattedDate</MudText>
+        <MudText><b>@_description</b></MudText>
+    </MudItem>
+    <MudItem xs="12" sm="3">
+        <MudText>Precipitación:</MudText>
+        <MudText><b>@(Math.Truncate(_maxRainProbability))%</b></MudText>
+    </MudItem>
+    <MudItem xs="12" sm="2">
+        <MudImage ObjectFit="ObjectFit.None" ObjectPosition="ObjectPosition.Center"
+                  Height="60" Width="70" Src="@_srcImg"
+                  Alt="Weather Icon"
+                  Elevation="0" Class="rounded-lg"/>
+    </MudItem>
+    <MudItem xs="12" sm="2">
+        <MudText><b>@(Math.Truncate(DailyForecast.MaxTemp))º</b></MudText>
+        <MudText><b>@(Math.Truncate(DailyForecast.MinTemp))º</b></MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public DailyForecast DailyForecast { get; set; }
+
+    private string _formattedDate;
+    private string _srcImg;
+    private string _description;
+    private double _maxRainProbability;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //await base.OnParametersSetAsync();
+
+        if (DailyForecast != null)
+        {
+            _maxRainProbability = DailyForecast.MaxRainProbability * 100;
+
+            _formattedDate = DailyForecast.Date.ToString("dddd, dd 'de' MMMM 'de' yyyy", CultureInfo.GetCultureInfo("es-ES"));
+            _formattedDate = char.ToUpper(_formattedDate[0]) + _formattedDate.Substring(1);
+
+            _description = DailyForecast.Description;
+            if (!string.IsNullOrEmpty(_description))
+            {
+                _description = char.ToUpper(_description[0]) + _description.Substring(1);
+            }
+
+            _srcImg = $"/icon/{DailyForecast.Icon}@2x.png";
+        }
+    }
+
+}

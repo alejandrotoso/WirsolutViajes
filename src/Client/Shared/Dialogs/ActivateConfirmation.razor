@@ -1,0 +1,43 @@
+﻿@namespace WirsolutViajes.Client.Shared.Dialogs
+
+<MudDialog>
+    <TitleContent>
+
+        <MudAlert Severity="Severity.Success" ContentAlignment="HorizontalAlignment.Center" NoIcon="true" Dense="true" Class="my-2">
+            <MudIcon Icon="@Icons.Material.Filled.Check" Class="mr-3 mb-n1" />
+            @ContentTitle
+        </MudAlert>
+    </TitleContent>
+    <DialogContent>
+        <br/>
+        <MudText>@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Dark" Variant="Variant.Filled" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Confirmar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string ContentTitle { get; set; }
+    [Parameter] public string ContentText { get; set; }
+
+    private string _contentText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ContentTitle == "")
+        {
+            ContentTitle = "Delete Confirmation";
+        }
+    }
+
+    void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    void Cancel() => MudDialog.Cancel();
+}

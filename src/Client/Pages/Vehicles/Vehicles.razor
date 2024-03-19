@@ -1,0 +1,126 @@
+﻿@page "/vehiculos"
+@using WirsolutViajes.Client.Shared.Components
+@using WirsolutViajes.Shared.DTOs
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+
+
+    .nowrap {
+        white-space: nowrap;
+    }
+
+    .mud-table-cell-padding-end {
+        padding-inline-end: 4px !important;
+    }
+
+
+</style>
+
+<TitlePage Title="Vehículos" Description="Gestión de flota de transporte." />
+
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_vehiclesList" Dense="@_dense" Bordered="@_bordered" Striped="@_striped"
+              Filter="new Func<VehicleDTO, bool>(Search)" @bind-brand="_vehicle">
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">Crear</MudButton>
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetVehicleAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary">Recargar</MudButton>
+            </div>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Buscar Vehículos" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.BrandVehicleType.VehicleType.Name)">Tipo Vehículo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.VehicleSubtype.Name)">Subtipo Vehículo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.BrandVehicleType.Brand.Name)">Marca</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.Model.Name)">Modelo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.LicensePlate)">Patente</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.YearManufactured)">Año Fabricación</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<VehicleDTO, object>(x => x.Mileage)">Kilometraje</MudTableSortLabel></MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh Class="mud-table-cell-padding-end" Style="width: 100px;"><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.DeactivationComment)">Comentario de Desactivación</MudTableSortLabel></MudTh>
+            <MudTh Class="mud-table-cell-padding-end" Style="width: 45px;"><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.DeactivatedAt)">Fecha de Desactivación</MudTableSortLabel></MudTh>
+
+
+            <MudTh Style="text-align:right">Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id" Class="mud-table-cell-padding-end">@context.Id</MudTd>
+            <MudTd DataLabel="TipoVehiculo">
+                <MudHighlighter Text="@context.BrandVehicleType.VehicleType.Name" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="TipoVehiculo" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.VehicleSubtype.Name" HighlightedText="@_searchString" />
+            </MudTd>
+
+
+
+            <MudTd DataLabel="Marca" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.BrandVehicleType.Brand.Name" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Modelo" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.Model.Name" HighlightedText="@_searchString" />
+            </MudTd>
+
+            <MudTd DataLabel="Patente" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.LicensePlate" HighlightedText="@_searchString" />
+            </MudTd>
+
+            <MudTd DataLabel="AnioFabricacion" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.YearManufactured.ToString()" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Kilometraje" Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.Mileage.ToString()" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Activo" Class="mud-table-cell-padding-end">
+                <MudCheckBox @bind-Checked="@context.Active" ReadOnly Color="Color.Secondary"></MudCheckBox>
+            </MudTd>
+
+
+            <MudTd Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.DeactivationComment" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd Class="mud-table-cell-padding-end">
+                <MudHighlighter Text="@context.DeactivatedAt?.ToString("dd/MM/yyyyy")" HighlightedText="@_searchString" />
+            </MudTd>
+
+
+
+            <MudTd DataLabel="" Style="text-align:right; " Class="nowrap">
+                <MudTooltip Text="Editar vehículo" Color="Color.Default">
+                    <MudFab @onclick="@(() => InvokeModal(@context.Id))" Disabled="@(!context.Active)"
+                            Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                </MudTooltip>
+                <MudTooltip Text="Desactivar vehículo." Color="Color.Default">
+                    <MudFab @onclick="@(() => Delete(@context))" Disabled="@(!context.Active)"
+                            Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                </MudTooltip>
+                <MudTooltip Text="Activar vehículo." Color="Color.Default">
+                    <MudFab @onclick="@(() => Activate(@context))" Disabled="@(context.Active)"
+                            Color="Color.Success" StartIcon="@Icons.Material.Filled.Check" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                </MudTooltip>
+            </MudTd>
+
+            
+        </RowTemplate>
+        <PagerContent>
+            <TablePager />
+        </PagerContent>
+    </MudTable>
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Denso</MudSwitch>
+        <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Rayado</MudSwitch>
+        <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordeado</MudSwitch>
+    </div>
+}

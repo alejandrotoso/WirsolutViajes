@@ -1,0 +1,56 @@
+﻿@namespace WirsolutViajes.Client.Shared.Dialogs
+
+
+<MudDialog>
+    <TitleContent>
+        <MudAlert Severity="Severity.Error" ContentAlignment="HorizontalAlignment.Center" NoIcon="true" Dense="true" Class="my-2">
+            <MudIcon Icon="@Icons.Material.Filled.Delete" Class="mr-3 mb-n1" />
+            @ContentTitle
+        </MudAlert>
+    </TitleContent>
+    <DialogContent>
+        @if (Active)
+        {
+            @*Para ingresar un comentario*@
+            <MudTextField T="string" @bind-Value="@_contentText" Label="Comentario" MaxLength="200" MaxLines="4" Lines="2"></MudTextField>
+        }
+        <MudText>@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Dark" Variant="Variant.Filled" OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">Confirmar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string ContentTitle { get; set; }
+    [Parameter] public string ContentText { get; set; }
+    [Parameter] public bool Active { get; set; } = false;
+
+    private string _contentText = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ContentTitle == "")
+        {
+            ContentTitle = "Delete Confirmation";
+        }
+    }
+
+    void Submit()
+    {
+        @if (Active)
+        {
+            // Regresa un comentario*@
+            MudDialog.Close(DialogResult.Ok(_contentText));
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+}

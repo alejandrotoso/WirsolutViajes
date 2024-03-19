@@ -1,0 +1,30 @@
+﻿@using MudBlazor
+
+
+
+
+<MudNavMenu Rounded="true" Color="Color.Primary">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AddRoad">Viajes</MudNavLink>
+
+       
+
+    <MudListSubheader Class="mt-2 mb-n2">Gestión de Datos</MudListSubheader>
+
+    
+    <MudNavLink Href="/vehiculos" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AirportShuttle">Vehículos</MudNavLink>
+    <MudNavLink Href="/ciudades" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LocationCity">Ciudades</MudNavLink>
+
+</MudNavMenu>
+
+@code {
+
+
+    private bool _canViewSACDCM;
+
+    private bool _canAdministrateSystem;
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

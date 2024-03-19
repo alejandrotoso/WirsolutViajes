@@ -1,0 +1,97 @@
+﻿@page "/ciudades"
+@using WirsolutViajes.Client.Shared.Components
+@using WirsolutViajes.Shared.DTOs
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+
+    .mud-table-cell {
+        white-space: nowrap;
+        padding-block: 3px !important;
+    }
+
+</style>
+
+
+
+<TitlePage Title="Ciudades" Description="Gestión de destinos." />
+@if (!_loaded)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_citiesList" Dense="@_dense" Bordered="@_bordered" Striped="@_striped"
+              Filter="new Func<CityDTO, bool>(Search)" @bind-brand="_city">
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" OnClick="(() => InvokeModal())" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">Crear</MudButton>
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetCitiesAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary">Recargar</MudButton>
+            </div>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="Buscar Ciudades" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.Name)">Ciudad</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.Country)">Pais</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.State)">Estado</MudTableSortLabel></MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.DeactivationComment)">Comentario de Desactivación</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<CityDTO, object>(x => x.DeactivatedAt)">Fecha de Desactivación</MudTableSortLabel></MudTh>
+
+
+            <MudTh Style="text-align:right">Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Ciudad">
+                <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Pais">
+                <MudHighlighter Text="@context.Country" HighlightedText="@_searchString" />
+            </MudTd>
+
+
+            <MudTd DataLabel="Marca">
+                <MudHighlighter Text="@context.State" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd DataLabel="Activo">
+                <MudCheckBox @bind-Checked="@context.Active" ReadOnly Color="Color.Secondary"></MudCheckBox>
+            </MudTd>
+
+            <MudTd>
+                <MudHighlighter Text="@context.DeactivationComment" HighlightedText="@_searchString" />
+            </MudTd>
+            <MudTd>
+                <MudHighlighter Text="@context.DeactivatedAt?.ToString("dd/MM/yyyyy")" HighlightedText="@_searchString" />
+            </MudTd>
+
+
+            <MudTd DataLabel="" Style="text-align:right; " Class="mud-table-cell">
+                <MudTooltip Text="Desactivar ciudad." Color="Color.Default">
+                    <MudFab @onclick="@(() => Delete(@context))" Disabled="@(!context.Active)"
+                            Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                </MudTooltip>
+                <MudTooltip Text="Activar ciudad." Color="Color.Default">
+                    <MudFab @onclick="@(() => Activate(@context))" Disabled="@(context.Active)"
+                            Color="Color.Success" StartIcon="@Icons.Material.Filled.Check" Size="Size.Small" DisableElevation=" false" IconSize="Size.Medium" />
+                </MudTooltip>
+            </MudTd>
+
+            
+        </RowTemplate>
+        <PagerContent>
+            <TablePager />
+        </PagerContent>
+    </MudTable>
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary">Denso</MudSwitch>
+        <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary">Rayado</MudSwitch>
+        <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning">Bordeado</MudSwitch>
+    </div>
+}

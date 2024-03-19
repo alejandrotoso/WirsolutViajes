@@ -1,0 +1,31 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.JSInterop
+@using WirsolutViajes.Client
+@using WirsolutViajes.Client.Services
+@using WirsolutViajes.Client.Infrastructure.Managers
+@using WirsolutViajes.Client.Infrastructure.Services
+@using WirsolutViajes.Client.Shared
+
+
+
+@using MudBlazor
+
+
+@inject IDialogService _dialogService
+@inject ISnackbar _snackBar
+
+
+@inject NotificationService _notificationService;
+
+@inject ICityManager _cityManager;
+@inject IValueManager _valueManager;
+@inject IVehicleManager _vehicleManager;
+@inject ITripManager _tripManager ;
+
+@inject IWeatherAPIService _weatherAPIService
